@@ -50,6 +50,26 @@ the hotspot, then run `sudo bash scripts/install.sh`. See
 [INSTALL-WPSD.md](INSTALL-WPSD.md) for the full SSH deployment flow, including
 microSD backup and restore options.
 
+Install directly from GitHub over SSH:
+
+```bash
+ssh pi-star@wpsd.local
+
+cd /home/pi-star
+git clone git@github.com:Hoser01/wpsd-ysf-bm-router.git
+cd wpsd-ysf-bm-router
+
+sudo bash scripts/install.sh
+```
+
+Then open the admin UI:
+
+```text
+http://wpsd.local:8092/
+```
+
+If `wpsd.local` does not resolve, use the hotspot IP address instead.
+
 ## Admin UI
 
 The package includes a separate dark admin interface at:
