@@ -1,0 +1,42 @@
+# Admin UI
+
+`ysf-bm-router` includes a separate admin interface for editing router settings
+without modifying WPSD dashboard files.
+
+Default URL:
+
+```text
+http://wpsd.local:8092/
+```
+
+Use the hotspot IP address if `wpsd.local` does not resolve.
+
+The installer enables and starts the admin service automatically. It runs
+separately from the router service:
+
+```bash
+sudo systemctl enable --now ysf-bm-router-admin.service
+sudo systemctl status ysf-bm-router-admin.service
+```
+
+The interface can edit every option in:
+
+- `[ysf]`
+- `[brandmeister]`
+- `[behavior]`
+- `[[routes]]`
+
+When you click `Apply & Restart`, the admin service:
+
+1. Builds a complete router config from the form.
+2. Validates it with the same model used by the router.
+3. Writes `/opt/ysf-bm-router/config/ysf-bm-router.toml` atomically.
+4. Preserves the previous file as `ysf-bm-router.toml.bak`.
+5. Restarts `ysf-bm-router.service`.
+6. Shows the save and restart status onscreen.
+
+Use `Save Only` when preparing changes that should not take effect until a
+later manual restart.
+
+Security note: the admin UI is intended for trusted hotspot LAN access. Do not
+forward port `8092` to the internet.

@@ -1,0 +1,18 @@
+[Unit]
+Description=YSF to BrandMeister DG-ID Router
+Wants=network-online.target
+After=network-online.target ysfgateway.service
+Conflicts=ysf2dmr.service
+
+[Service]
+Type=simple
+User=pi-star
+Group=pi-star
+WorkingDirectory=/opt/ysf-bm-router
+Environment=PYTHONPATH=/opt/ysf-bm-router/src
+ExecStart=/usr/bin/python3 -m ysf_bm_router.cli --config /opt/ysf-bm-router/config/ysf-bm-router.toml --log-level INFO
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

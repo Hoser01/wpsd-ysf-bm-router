@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+.upstream/
+.codex_tmp_mmdvmcm2/
+captures/
+captures-*.ndjson
+*.pyc
+*.pyo
+*.pyd
+dist/
+build/
+*.zip
+*.log
+codex_tmp_*
+ysf-bm-router-codex-prompt.txt

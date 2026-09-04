@@ -1,0 +1,350 @@
+[ysf]
+listen_address = "127.0.0.1"
+listen_port = 42002
+reflector_name = "YSF-BM"
+
+[brandmeister]
+server = ""
+port = 42001
+callsign = ""
+dmr_id = ""
+password = ""
+backend = "hybrid_dmr_return"
+master_server = "3103.master.brandmeister.network"
+master_port = 62031
+master_local_port = 62032
+master_jitter_ms = 360
+master_options = ""
+hotspot_type = "MMDVM_DMO"
+rx_frequency = 431150000
+tx_frequency = 431150000
+color_code = 1
+power = 1
+
+[behavior]
+default_dgid = 10
+return_to_default_minutes = 30
+tg_change_silence_seconds = 2
+return_frame_interval_seconds = 0.09
+return_start_delay_seconds = 0.18
+rewrite_return_dgid = false
+rewrite_return_source = false
+insert_return_header = true
+suppress_route_change_transmission = false
+show_dgid_callsign = false
+acknowledge_tg_change = true
+
+[[routes]]
+dgid = 10
+talkgroup = 3205642
+short_name = "LZ"
+long_name = "N0NMS / LZ"
+region = "LZ"
+sort_order = 10
+enabled = true
+
+[[routes]]
+dgid = 11
+talkgroup = 313136
+short_name = "KCWide"
+long_name = "KCWide"
+region = "LZ"
+sort_order = 11
+enabled = true
+
+[[routes]]
+dgid = 20
+talkgroup = 3129
+short_name = "Missouri"
+long_name = "Missouri"
+region = "Missouri"
+sort_order = 20
+enabled = true
+
+[[routes]]
+dgid = 21
+talkgroup = 31290
+short_name = "MO ARES"
+long_name = "Missouri ARES"
+region = "Missouri"
+sort_order = 21
+enabled = true
+
+[[routes]]
+dgid = 22
+talkgroup = 31291
+short_name = "SWMO"
+long_name = "SWMO"
+region = "Missouri"
+sort_order = 22
+enabled = true
+
+[[routes]]
+dgid = 23
+talkgroup = 31292
+short_name = "STL Metro"
+long_name = "STL Metro"
+region = "Missouri"
+sort_order = 23
+enabled = true
+
+[[routes]]
+dgid = 24
+talkgroup = 31293
+short_name = "Branson"
+long_name = "Branson Area"
+region = "Missouri"
+sort_order = 24
+enabled = true
+
+[[routes]]
+dgid = 25
+talkgroup = 31294
+short_name = "NW MO"
+long_name = "NW Missouri"
+region = "Missouri"
+sort_order = 25
+enabled = true
+
+[[routes]]
+dgid = 26
+talkgroup = 31295
+short_name = "SE MO"
+long_name = "SE Missouri"
+region = "Missouri"
+sort_order = 26
+enabled = true
+
+[[routes]]
+dgid = 27
+talkgroup = 31296
+short_name = "Central MO"
+long_name = "Central Missouri"
+region = "Missouri"
+sort_order = 27
+enabled = true
+
+[[routes]]
+dgid = 28
+talkgroup = 31297
+short_name = "SWMO WX"
+long_name = "SW MO SkyWarn"
+region = "Missouri"
+sort_order = 28
+enabled = true
+
+[[routes]]
+dgid = 29
+talkgroup = 31298
+short_name = "KCN ARES"
+long_name = "KCN ARES"
+region = "Missouri"
+sort_order = 29
+enabled = true
+
+[[routes]]
+dgid = 30
+talkgroup = 31299
+short_name = "MO TAC"
+long_name = "Missouri TAC"
+region = "Missouri"
+sort_order = 30
+enabled = true
+
+[[routes]]
+dgid = 40
+talkgroup = 3105
+short_name = "Arkansas"
+long_name = "Arkansas Statewide"
+region = "Arkansas"
+sort_order = 40
+enabled = true
+
+[[routes]]
+dgid = 41
+talkgroup = 31051
+short_name = "AR WX"
+long_name = "Arkansas Severe Weather"
+region = "Arkansas"
+sort_order = 41
+enabled = true
+
+[[routes]]
+dgid = 42
+talkgroup = 31055
+short_name = "NC AR"
+long_name = "North Central Arkansas"
+region = "Arkansas"
+sort_order = 42
+enabled = true
+
+[[routes]]
+dgid = 43
+talkgroup = 31058
+short_name = "NW AR"
+long_name = "Northwest Arkansas"
+region = "Arkansas"
+sort_order = 43
+enabled = true
+
+[[routes]]
+dgid = 44
+talkgroup = 31229
+short_name = "ArkLaTex"
+long_name = "ArkLaTex"
+region = "Arkansas"
+sort_order = 44
+enabled = true
+
+[[routes]]
+dgid = 45
+talkgroup = 31501
+short_name = "Little Rock"
+long_name = "Little Rock Metro"
+region = "Arkansas"
+sort_order = 45
+enabled = true
+
+[[routes]]
+dgid = 50
+talkgroup = 3120
+short_name = "Kansas"
+long_name = "Kansas Statewide"
+region = "Kansas"
+sort_order = 50
+enabled = true
+
+[[routes]]
+dgid = 51
+talkgroup = 31200
+short_name = "KS ARES"
+long_name = "Kansas ARES"
+region = "Kansas"
+sort_order = 51
+enabled = true
+
+[[routes]]
+dgid = 52
+talkgroup = 31201
+short_name = "BYRG"
+long_name = "BYRG"
+region = "Kansas"
+sort_order = 52
+enabled = true
+
+[[routes]]
+dgid = 53
+talkgroup = 31202
+short_name = "BYRG"
+long_name = "BYRG"
+region = "Kansas"
+sort_order = 53
+enabled = true
+
+[[routes]]
+dgid = 54
+talkgroup = 31204
+short_name = "CKRG"
+long_name = "CKRG"
+region = "Kansas"
+sort_order = 54
+enabled = true
+
+[[routes]]
+dgid = 55
+talkgroup = 31205
+short_name = "KC WX"
+long_name = "KC SKYWARN"
+region = "Kansas"
+sort_order = 55
+enabled = true
+
+[[routes]]
+dgid = 56
+talkgroup = 31206
+short_name = "Central KS WX"
+long_name = "Central Kansas SKYWARN"
+region = "Kansas"
+sort_order = 56
+enabled = true
+
+[[routes]]
+dgid = 57
+talkgroup = 31298
+short_name = "KCN ARES"
+long_name = "KCN ARES"
+region = "Kansas"
+sort_order = 57
+enabled = true
+
+[[routes]]
+dgid = 60
+talkgroup = 3140
+short_name = "Oklahoma"
+long_name = "Oklahoma Statewide"
+region = "Oklahoma"
+sort_order = 60
+enabled = true
+
+[[routes]]
+dgid = 61
+talkgroup = 31400
+short_name = "OK TAC"
+long_name = "OK TAC"
+region = "Oklahoma"
+sort_order = 61
+enabled = true
+
+[[routes]]
+dgid = 62
+talkgroup = 31401
+short_name = "OK Central"
+long_name = "OK Central"
+region = "Oklahoma"
+sort_order = 62
+enabled = true
+
+[[routes]]
+dgid = 63
+talkgroup = 31402
+short_name = "OK East"
+long_name = "OK East"
+region = "Oklahoma"
+sort_order = 63
+enabled = true
+
+[[routes]]
+dgid = 64
+talkgroup = 31403
+short_name = "YSF OK"
+long_name = "YSF Oklahoma Link"
+region = "Oklahoma"
+sort_order = 64
+enabled = true
+
+[[routes]]
+dgid = 65
+talkgroup = 31404
+short_name = "SE OK EM"
+long_name = "SE OK EM TAC"
+region = "Oklahoma"
+sort_order = 65
+enabled = true
+
+[[routes]]
+dgid = 66
+talkgroup = 31408
+short_name = "OK WX"
+long_name = "Oklahoma Weather"
+region = "Oklahoma"
+sort_order = 66
+enabled = true
+
+[[routes]]
+dgid = 67
+talkgroup = 31095
+short_name = "Region 5"
+long_name = "US Call Sign Region 5"
+region = "Oklahoma"
+sort_order = 67
+enabled = true
