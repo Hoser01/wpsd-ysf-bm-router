@@ -2,6 +2,12 @@
 
 `ysf-bm-router` is a WPSD companion service that presents itself as a local YSF reflector and maps Yaesu System Fusion DG-ID values to BrandMeister talkgroups.
 
+With this router, you can program an extra memory bank on your Yaesu Fusion
+radio for your hotspot and treat each channel like a BrandMeister talkgroup
+preset. For example, one channel can transmit DG-ID `10` for LZ, another can
+transmit DG-ID `22` for SWMO, and another can transmit DG-ID `40` for Arkansas,
+while the router handles the BrandMeister talkgroup selection behind the scenes.
+
 The service is designed to live outside WPSD-managed files under:
 
 ```text
