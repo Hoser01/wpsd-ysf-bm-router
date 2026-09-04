@@ -33,27 +33,41 @@ Radio TX = hotspot RX
 Radio RX = hotspot TX
 ```
 
-## Two Useful Channel Styles
+## Recommended DG-ID Pattern
 
-One-channel-per-talkgroup style:
+For normal use, set the channel's TX DG-ID to the route you want to select and
+set RX DG-ID to `00`.
 
 ```text
-Row 535: Name DG10 LZ,       RX DG-ID 10, TX DG-ID 10, TG 3205642
-Row 536: Name DG11 KCWide,   RX DG-ID 11, TX DG-ID 11, TG 313136
-Row 539: Name DG22 SWMO,     RX DG-ID 22, TX DG-ID 22, TG 31291
-Row 548: Name DG40 Arkansas, RX DG-ID 40, TX DG-ID 40, TG 3105
+RX DG-ID = 00
+TX DG-ID = mapped router DG-ID
 ```
 
-This keeps the radio display lined up with the DG-ID route being used.
+Examples:
 
-Return-on-00 style:
+```text
+Name DG10 LZ:       RX DG-ID 00, TX DG-ID 10, TG 3205642
+Name DG11 KCWide:   RX DG-ID 00, TX DG-ID 11, TG 313136
+Name DG22 SWMO:     RX DG-ID 00, TX DG-ID 22, TG 31291
+Name DG40 Arkansas: RX DG-ID 00, TX DG-ID 40, TG 3105
+```
+
+The radio transmits the mapped DG-ID to select the BrandMeister talkgroup. Return
+traffic normally comes back on DG-ID `00`, so `RX 00` is the most forgiving
+receive setting across radios and hotspots.
+
+## FT5D CSV Rows
+
+Rows `535` and later in the development FT5D CSV were used while testing this
+pattern. Row `569` is the clean example for the current recommendation:
 
 ```text
 Row 569: Name LZ2, RX DG-ID 00, TX DG-ID 10
 ```
 
-This was the working LZ test style. The radio transmits DG-ID `10` to select
-the LZ route, while accepting return audio on DG-ID `00`.
+Earlier rows used matching RX/TX DG-IDs while we were testing route selection.
+Those can still work in some setups, but `RX 00` with a mapped TX DG-ID is the
+recommended generic codeplug pattern.
 
 ## Matching Router Routes
 
@@ -79,5 +93,4 @@ the router config or through the admin UI.
 - Radio channel frequency does not match the hotspot transmit frequency.
 - Simplex hotspot has different WPSD TX/RX frequencies.
 - Radio TX DG-ID is not mapped in the router route table.
-- Radio RX DG-ID blocks return traffic. For early testing, `RX 00` is the most
-  forgiving choice.
+- Radio RX DG-ID blocks return traffic. Use `RX 00` for the generic setup.

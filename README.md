@@ -115,24 +115,24 @@ RX/TX mode: RX Normal TX Normal
 DG-ID SQL: 023
 ```
 
-One-channel-per-talkgroup examples:
+Recommended one-channel-per-talkgroup examples:
 
 ```text
-Row 535: DG10 LZ,       RX DG-ID 10, TX DG-ID 10, TG 3205642
-Row 536: DG11 KCWide,   RX DG-ID 11, TX DG-ID 11, TG 313136
-Row 539: DG22 SWMO,     RX DG-ID 22, TX DG-ID 22, TG 31291
-Row 548: DG40 Arkansas, RX DG-ID 40, TX DG-ID 40, TG 3105
+DG10 LZ:       RX DG-ID 00, TX DG-ID 10, TG 3205642
+DG11 KCWide:   RX DG-ID 00, TX DG-ID 11, TG 313136
+DG22 SWMO:     RX DG-ID 00, TX DG-ID 22, TG 31291
+DG40 Arkansas: RX DG-ID 00, TX DG-ID 40, TG 3105
 ```
 
-The working LZ test also used this return-on-00 style:
+The radio transmits the mapped DG-ID to select the route. Return traffic normally
+comes back on DG-ID `00`, so `RX 00` is the recommended generic receive setting.
+The working LZ test used this style:
 
 ```text
 Row 569: LZ2, RX DG-ID 00, TX DG-ID 10
 ```
 
-That lets the radio transmit DG-ID `10` to select the LZ route while accepting
-return audio on DG-ID `00`. See [docs/CODEPLUG-EXAMPLE.md](docs/CODEPLUG-EXAMPLE.md)
-for more detail.
+See [docs/CODEPLUG-EXAMPLE.md](docs/CODEPLUG-EXAMPLE.md) for more detail.
 
 ## Development
 
