@@ -78,6 +78,42 @@ For duplex hotspot operation:
 
 If the hotspot transmits on a different frequency than the radio is listening to, the radio may light green or flicker but will not decode valid C4FM audio.
 
+## Yaesu Codeplug Example
+
+Program the Yaesu channel in DN mode and use DG-IDs as BrandMeister talkgroup
+selectors. In the FT5D ADMS CSV used for testing, rows `535` and later are the
+example router channels.
+
+For simplex hotspot testing, the radio channel looked like this:
+
+```text
+RX Frequency: 431.150000
+TX Frequency: 431.150000
+Mode: DN
+Repeater shift: OFF
+RX/TX mode: RX Normal TX Normal
+DG-ID SQL: 023
+```
+
+One-channel-per-talkgroup examples:
+
+```text
+Row 535: DG10 LZ,       RX DG-ID 10, TX DG-ID 10, TG 3205642
+Row 536: DG11 KCWide,   RX DG-ID 11, TX DG-ID 11, TG 313136
+Row 539: DG22 SWMO,     RX DG-ID 22, TX DG-ID 22, TG 31291
+Row 548: DG40 Arkansas, RX DG-ID 40, TX DG-ID 40, TG 3105
+```
+
+The working LZ test also used this return-on-00 style:
+
+```text
+Row 569: LZ2, RX DG-ID 00, TX DG-ID 10
+```
+
+That lets the radio transmit DG-ID `10` to select the LZ route while accepting
+return audio on DG-ID `00`. See [docs/CODEPLUG-EXAMPLE.md](docs/CODEPLUG-EXAMPLE.md)
+for more detail.
+
 ## Development
 
 ```powershell

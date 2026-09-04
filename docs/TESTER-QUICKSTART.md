@@ -138,13 +138,17 @@ For duplex, program the radio with the inverse split:
 
 ## 9. Radio Setup
 
-Use DN mode. For the current LZ test:
+Use DN mode. For the current LZ test, the FT5D CSV example at row `569` uses:
 
 - RX DG-ID: `00`
 - TX DG-ID: `10`
 
 Key once on DG-ID `10` to select the LZ route. Return traffic should come back
 on DG-ID `00`.
+
+Rows `535` and later in the example FT5D CSV also show one-channel-per-DG-ID
+entries, where each channel uses matching RX/TX DG-IDs for the mapped route.
+See [CODEPLUG-EXAMPLE.md](CODEPLUG-EXAMPLE.md).
 
 ## 10. Report Back
 
