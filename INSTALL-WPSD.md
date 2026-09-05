@@ -116,15 +116,22 @@ The installer will:
 
 1. Install application files under `/opt/ysf-bm-router`.
 2. Preserve an existing `/opt/ysf-bm-router/config/ysf-bm-router.toml`.
-3. Install `ysf-bm-router.service`.
-4. Install `ysf-bm-router-admin.service`.
-5. Reload systemd.
-6. Enable and restart the admin UI.
-7. Print the YSF Hosts File Editor entry.
-8. Print the admin UI URL.
+3. Prefill router config from WPSD when possible.
+4. Copy the existing BrandMeister hotspot password from WPSD when available.
+5. Install `ysf-bm-router.service`.
+6. Install `ysf-bm-router-admin.service`.
+7. Reload systemd.
+8. Stop and disable WPSD's stock `ysf2dmr.service` and `ysf2dmr.timer`.
+9. Enable and restart the admin UI.
+10. Print the YSF Hosts File Editor entry.
+11. Print the admin UI URL.
 
 The installer does not start the main router service automatically, because
 BrandMeister credentials and routes should be reviewed first.
+
+On first install, WPSD-detected values overwrite the blank/default seed config.
+On later installs, existing router settings are preserved and only blank fields
+are filled.
 
 ## 6. Verify Settings In The Admin UI
 
@@ -144,8 +151,9 @@ In the admin UI, verify:
 
 - BrandMeister server and YSF Direct port.
 - Callsign.
-- DMR ID, including hotspot suffix if you use one.
-- Hotspot security password.
+- DMR ID. If WPSD only had a base subscriber ID, the installer starts with
+  suffix `10`.
+- Hotspot security password. The installer copies it from WPSD when available.
 - Backend is `hybrid_dmr_return`.
 - DMR master server, port, password, and options.
 - Behavior flags match the tested defaults.

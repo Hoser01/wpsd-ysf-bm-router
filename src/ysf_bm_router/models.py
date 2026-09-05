@@ -28,7 +28,7 @@ class Route:
 class YsfConfig:
     listen_address: str = "127.0.0.1"
     listen_port: int = 42002
-    reflector_name: str = "YSF-BM"
+    reflector_name: str = "YSF-BM-TEST"
 
 
 @dataclass(frozen=True)

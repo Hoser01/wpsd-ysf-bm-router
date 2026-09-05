@@ -11,6 +11,27 @@ http://wpsd.local:8092/
 
 Use the hotspot IP address if `wpsd.local` does not resolve.
 
+## Installer Prefill
+
+During install, the router tries to prefill the admin settings from WPSD config
+files already on the hotspot.
+
+Usually detected automatically:
+
+- Callsign.
+- DMR ID, using suffix `10` when only a base subscriber ID is found.
+- BrandMeister hotspot security password.
+- DMR master server, port, password, and options.
+- Hotspot RX/TX frequencies.
+- DMR color code.
+- WPSD location, description, URL, and power details.
+
+The password is copied locally from WPSD into this project's TOML config. It is
+not included in the repository or deploy zip.
+
+The route table is seeded with example DG-ID-to-talkgroup mappings and can be
+edited directly in the admin UI.
+
 ## WPSD Theme Matching
 
 The admin UI reads WPSD's selected dashboard color config from:

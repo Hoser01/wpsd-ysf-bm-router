@@ -17,7 +17,7 @@ install -d -m 0755 "${APP_DIR}/config"
 rm -rf "${APP_DIR}/src"
 cp -a "${SOURCE_ROOT}/src" "${APP_DIR}/src"
 
-for path in README.md INSTALL-WPSD.md THIRD_PARTY.md pyproject.toml; do
+for path in README.md INSTALL-WPSD.md LICENSE.md THIRD_PARTY.md pyproject.toml; do
   if [[ -f "${SOURCE_ROOT}/${path}" ]]; then
     install -m 0644 "${SOURCE_ROOT}/${path}" "${APP_DIR}/${path}"
   fi
@@ -33,16 +33,32 @@ if [[ -d "${SOURCE_ROOT}/scripts" ]]; then
   cp -a "${SOURCE_ROOT}/scripts" "${APP_DIR}/scripts"
 fi
 
-if [[ ! -f "${APP_DIR}/config/ysf-bm-router.toml" ]]; then
+CONFIG_PATH="${APP_DIR}/config/ysf-bm-router.toml"
+PREFILL_ARGS=()
+
+if [[ ! -f "${CONFIG_PATH}" ]]; then
   install -m 0640 "${SOURCE_ROOT}/config/ysf-bm-router.toml" "${APP_DIR}/config/ysf-bm-router.toml"
-  chown pi-star:pi-star "${APP_DIR}/config/ysf-bm-router.toml" || true
+  chown pi-star:pi-star "${CONFIG_PATH}" || true
 else
-  echo "Preserved existing ${APP_DIR}/config/ysf-bm-router.toml"
+  echo "Preserved existing ${CONFIG_PATH}"
+  PREFILL_ARGS+=(--only-missing)
+fi
+
+if PYTHONPATH="${APP_DIR}/src" python3 -m ysf_bm_router.wpsd_detect \
+  --seed "${SOURCE_ROOT}/config/ysf-bm-router.toml" \
+  --output "${CONFIG_PATH}" \
+  --hotspot-suffix 10 \
+  "${PREFILL_ARGS[@]}"; then
+  chown pi-star:pi-star "${CONFIG_PATH}" "${CONFIG_PATH}.bak" 2>/dev/null || true
+else
+  echo "Could not prefill router config from WPSD; use the admin UI to review settings." >&2
 fi
 
 install -m 0644 "${SOURCE_ROOT}/deploy/systemd/${SERVICE_NAME}" "/etc/systemd/system/${SERVICE_NAME}"
 install -m 0644 "${SOURCE_ROOT}/deploy/systemd/${ADMIN_SERVICE_NAME}" "/etc/systemd/system/${ADMIN_SERVICE_NAME}"
 systemctl daemon-reload
+
+systemctl disable --now ysf2dmr.service ysf2dmr.timer 2>/dev/null || true
 
 chown -R pi-star:pi-star "${APP_DIR}/src" "${APP_DIR}/docs" "${APP_DIR}/scripts" 2>/dev/null || true
 systemctl enable "${ADMIN_SERVICE_NAME}"
@@ -56,12 +72,16 @@ echo
 echo "Admin UI:"
 echo "  http://<hotspot-hostname-or-ip>:8092/"
 echo
+echo "The installer prefilled the router config from WPSD when possible."
+echo "Open the admin UI to verify callsign, DMR ID suffix, password, and routes."
+echo
 echo "Before testing, confirm simplex hotspot TX and RX both match the radio,"
 echo "or use the correct inverse split for duplex."
 echo
 echo "To run:"
-echo "  sudo systemctl stop ysf2dmr.service ysf2dmr.timer"
 echo "  sudo systemctl enable --now ${SERVICE_NAME}"
+echo
+echo "Stock WPSD YSF2DMR has been stopped/disabled for this router path."
 echo
 echo "The admin service has already been enabled and started by this installer."
 echo

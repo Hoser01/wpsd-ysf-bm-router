@@ -1,7 +1,7 @@
 [ysf]
 listen_address = "127.0.0.1"
 listen_port = 42002
-reflector_name = "YSF-BM"
+reflector_name = "YSF-BM-TEST"
 
 [brandmeister]
 server = ""

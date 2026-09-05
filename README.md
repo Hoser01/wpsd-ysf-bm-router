@@ -81,6 +81,11 @@ http://wpsd.local:8092/
 Use the admin UI to verify BrandMeister credentials, backend settings, behavior
 flags, and DG-ID-to-talkgroup routes. Then click `Apply & Restart`.
 
+The installer attempts to prefill callsign, DMR ID, hotspot password, RF
+frequencies, BrandMeister master settings, and WPSD location details from the
+hotspot's existing WPSD config files. The DMR ID starts with hotspot suffix
+`10` when only a base subscriber ID is detected.
+
 Detailed admin instructions are in [docs/ADMIN-UI.md](docs/ADMIN-UI.md).
 
 ## Yaesu Channels
