@@ -47,6 +47,8 @@ Do not edit WPSD-generated host files directly.
 Before installing experimental hotspot software, consider imaging your existing
 WPSD microSD card so you can return the hotspot to its current state.
 
+See [docs/BACKUP-WPSD.md](docs/BACKUP-WPSD.md) for the full backup checklist.
+
 Recommended Windows imaging tool:
 
 ```text

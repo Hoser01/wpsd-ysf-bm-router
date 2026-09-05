@@ -4,11 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ysf-bm-router"
-version = "0.1.0"
+version = "0.1.1"
 description = "Local WPSD YSF reflector service that maps Yaesu DG-ID values to BrandMeister DMR talkgroups."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "GPL-3.0-or-later" }
+license-files = ["LICENSE.md", "THIRD_PARTY.md"]
 authors = [
     { name = "LZARC" }
 ]

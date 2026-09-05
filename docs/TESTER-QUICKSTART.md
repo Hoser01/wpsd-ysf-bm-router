@@ -19,7 +19,7 @@ but it is not the same as a full microSD image.
 From your computer:
 
 ```bash
-scp ysf-bm-router-0.1.0-test-20260904.zip pi-star@wpsd.local:/home/pi-star/
+scp ysf-bm-router-0.1.1-alpha-20260905.zip pi-star@wpsd.local:/home/pi-star/
 ```
 
 If `wpsd.local` does not resolve, use the hotspot IP address.
@@ -38,7 +38,7 @@ On the hotspot:
 
 ```bash
 cd /home/pi-star
-unzip -o ysf-bm-router-0.1.0-test-20260904.zip -d ysf-bm-router
+unzip -o ysf-bm-router-0.1.1-alpha-20260905.zip -d ysf-bm-router
 cd ysf-bm-router
 sudo bash scripts/install.sh
 ```

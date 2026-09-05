@@ -15,6 +15,17 @@ The service installs outside WPSD-managed paths:
 /opt/ysf-bm-router
 ```
 
+## Alpha Notice
+
+This is alpha software. It has been validated in the developer's WPSD/Yaesu
+hotspot setup, but it has not been extensively tested across different radios,
+modems, WPSD versions, BrandMeister masters, or simplex/duplex hotspot
+configurations.
+
+Before installing, make a WPSD Backup/Restore export and strongly consider
+imaging your existing WPSD microSD card. See
+[docs/BACKUP-WPSD.md](docs/BACKUP-WPSD.md).
+
 ## Quick Install
 
 SSH into the WPSD hotspot and install from GitHub:
@@ -99,10 +110,12 @@ codeplug pattern.
 ## More Docs
 
 - [docs/CURRENT-TESTED-STATE.md](docs/CURRENT-TESTED-STATE.md)
+- [docs/BACKUP-WPSD.md](docs/BACKUP-WPSD.md)
 - [docs/ADMIN-UI.md](docs/ADMIN-UI.md)
 - [docs/CODEPLUG-EXAMPLE.md](docs/CODEPLUG-EXAMPLE.md)
 - [docs/CONFIGURATION.md](docs/CONFIGURATION.md)
 - [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+- [LICENSE.md](LICENSE.md)
 
 ## Development
 
@@ -112,7 +125,7 @@ python -m venv .venv
 .\.venv\Scripts\python -m pytest
 ```
 
-## Acknowledgments
+## License And Acknowledgments
 
 Thanks to Chip Cuccio, `W0CHP`, for WPSD and the hotspot platform this project
 is designed to complement:
@@ -124,4 +137,4 @@ This project was inspired by YSFBMDirect by Stefano IS0EIR:
 https://github.com/stefanolande/YSFBMDirect
 
 Selected YSF decoder pieces are vendored with attribution. See
-[THIRD_PARTY.md](THIRD_PARTY.md).
+[LICENSE.md](LICENSE.md) and [THIRD_PARTY.md](THIRD_PARTY.md).
