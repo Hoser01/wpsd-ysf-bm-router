@@ -41,6 +41,62 @@ The interface can edit every option in:
 - `[behavior]`
 - `[[routes]]`
 
+## Settings To Verify
+
+Before clicking `Apply & Restart`, verify these fields.
+
+YSF listener:
+
+- Listen host is `127.0.0.1`.
+- Listen port is `42002`.
+- Reflector name matches the WPSD host entry, usually `YSF-BM-TEST`.
+
+BrandMeister:
+
+- YSF Direct server is correct for your region.
+- YSF Direct port is `42001`.
+- Callsign is your hotspot callsign.
+- DMR ID includes the hotspot suffix if you use one.
+- Password is your BrandMeister hotspot security password.
+- Backend is `hybrid_dmr_return`.
+- DMR master server and port are correct.
+- DMR master password matches the hotspot security password.
+- Master options contain the startup talkgroup you want, such as
+  `TS2_1=3205642;`.
+
+Behavior:
+
+- `rewrite_return_dgid` is off for the tested generic Yaesu setup.
+- `rewrite_return_source` is off for the tested generic Yaesu setup.
+- `show_dgid_callsign` is off for the tested generic Yaesu setup.
+- `insert_return_header` is on.
+- Return frame interval and start delay are left at the tested defaults unless
+  you are intentionally experimenting.
+
+Routes:
+
+- Every Yaesu channel TX DG-ID has one matching enabled route.
+- Each route points to the intended BrandMeister talkgroup.
+- DG-ID values are unique.
+- Route names are short enough to scan quickly in the admin UI.
+
+WPSD:
+
+- System Fusion / YSF is enabled.
+- The `YSF-BM-TEST` host entry exists in WPSD.
+- WPSD is linked to `YSF-BM-TEST`.
+- WPSD's stock YSF2DMR service is stopped/disabled for this path.
+- YSF X-Mode is off unless you are intentionally testing WPSD's own cross-mode
+  flow instead of this router.
+
+Yaesu radio:
+
+- Each channel is in DN mode.
+- Each channel uses `RX DG-ID 00`.
+- Each channel uses `TX DG-ID` equal to the desired router route.
+
+See [CODEPLUG-EXAMPLE.md](CODEPLUG-EXAMPLE.md) for exact channel examples.
+
 When you click `Apply & Restart`, the admin service:
 
 1. Builds a complete router config from the form.

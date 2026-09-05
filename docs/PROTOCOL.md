@@ -20,7 +20,19 @@ An unmapped DG-ID still needs a separate capture fixture.
 
 BrandMeister transport note: WPSD `ysf2dmr` uses the DMR/Homebrew master port, commonly `62031`. The YSF Direct login flow uses `YSFL` / `YSFACK` / `YSFK` messages and upstream YSF Direct examples use port `42001`.
 
-Live return-audio testing showed that raw BrandMeister YSF Direct frames can make WPSD key YSF RF while an FT5D still fails to decode audio. The DMR-master backend is therefore the preferred return-audio path. It should follow the WPSD/MMDVM bridge pattern:
+Live return-audio testing showed that BrandMeister YSF Direct can carry usable
+audio both directions when the WPSD RF configuration and Yaesu channel
+frequencies match. The current tested backend is:
+
+```toml
+backend = "hybrid_dmr_return"
+```
+
+In this mode, outbound and return audio use BrandMeister YSF Direct. The DMR
+master connection remains available for talkgroup context/options.
+
+The local DMR-to-YSF conversion path remains experimental/reference work. If it
+is revisited, it should follow the WPSD/MMDVM bridge pattern:
 
 - parse 55-byte `DMRD` Homebrew packets
 - use the DMR voice payload at bytes `20..52`

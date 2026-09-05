@@ -1,77 +1,99 @@
 # Yaesu Codeplug Example
 
 The router lets a Yaesu Fusion radio use DG-IDs like channel selectors for
-BrandMeister talkgroups. The supplied test config maps DG-ID `10` to TG
-`3205642`, DG-ID `22` to TG `31291`, and so on.
+BrandMeister talkgroups. Program one Yaesu memory channel per BrandMeister
+talkgroup you want quick access to.
 
-## FT5D / ADMS Pattern
+## Channel Pattern
 
-Rows `535` and later in the test FT5D CSV show the intended pattern:
+Use this pattern for each router channel:
 
 ```text
-Frequency: 431.150000 MHz
+Channel name: short talkgroup label
+Receive frequency: hotspot transmit frequency
+Transmit frequency: hotspot receive frequency
 Mode: DN
-Repeater shift: OFF for simplex hotspot testing
-SQL/Decode type: OFF
+AMS/Mode behavior: fixed DN is recommended
+Repeater shift: OFF for simplex, correct split for duplex
+Decode/SQL type: OFF
 DG-ID SQL: 023
+RX DG-ID: 00
+TX DG-ID: mapped router DG-ID
 RX/TX mode: RX Normal TX Normal
-TX power: as appropriate for your hotspot, usually Low or reduced power
+TX power: low or reduced power appropriate for your hotspot
+Step: 25.0 kHz
 ```
 
-For a simplex hotspot, the channel RX and TX frequencies should both match the
-hotspot frequency. In the working test, that was:
+For a simplex hotspot, the channel RX and TX frequencies are usually the same:
 
 ```text
-RX Frequency: 431.150000
-TX Frequency: 431.150000
+Radio RX Frequency = hotspot TX frequency
+Radio TX Frequency = hotspot RX frequency
 ```
 
 For a duplex hotspot, program the radio with the inverse split:
 
 ```text
-Radio TX = hotspot RX
-Radio RX = hotspot TX
+Radio TX Frequency = hotspot RX frequency
+Radio RX Frequency = hotspot TX frequency
 ```
 
-## Recommended DG-ID Pattern
+Frequency details and WPSD checks are in
+[CONFIGURATION.md](CONFIGURATION.md#frequencies).
 
-For normal use, set the channel's TX DG-ID to the route you want to select and
-set RX DG-ID to `00`.
+## DG-ID Pattern
+
+For normal use:
 
 ```text
 RX DG-ID = 00
-TX DG-ID = mapped router DG-ID
+TX DG-ID = route DG-ID
 ```
 
-Examples:
+The radio transmits the route DG-ID to select the BrandMeister talkgroup. Return
+traffic is most compatible when the Yaesu channel receives DG-ID `00`.
+
+## Example Channels
+
+These are example channel values using a simplex hotspot on `431.150000 MHz`.
+Use your own hotspot frequency and route list.
 
 ```text
-Name DG10 LZ:       RX DG-ID 00, TX DG-ID 10, TG 3205642
-Name DG11 KCWide:   RX DG-ID 00, TX DG-ID 11, TG 313136
-Name DG22 SWMO:     RX DG-ID 00, TX DG-ID 22, TG 31291
-Name DG40 Arkansas: RX DG-ID 00, TX DG-ID 40, TG 3105
+Name: DG10 LZ
+RX Frequency: 431.150000
+TX Frequency: 431.150000
+Mode: DN
+RX DG-ID: 00
+TX DG-ID: 10
+Router route: DG-ID 10 -> BrandMeister TG 3205642
 ```
-
-The radio transmits the mapped DG-ID to select the BrandMeister talkgroup. Return
-traffic normally comes back on DG-ID `00`, so `RX 00` is the most forgiving
-receive setting across radios and hotspots.
-
-## FT5D CSV Rows
-
-Rows `535` and later in the development FT5D CSV were used while testing this
-pattern. Row `569` is the clean example for the current recommendation:
 
 ```text
-Row 569: Name LZ2, RX DG-ID 00, TX DG-ID 10
+Name: DG22 SWMO
+RX Frequency: 431.150000
+TX Frequency: 431.150000
+Mode: DN
+RX DG-ID: 00
+TX DG-ID: 22
+Router route: DG-ID 22 -> BrandMeister TG 31291
 ```
 
-Earlier rows used matching RX/TX DG-IDs while we were testing route selection.
-Those can still work in some setups, but `RX 00` with a mapped TX DG-ID is the
-recommended generic codeplug pattern.
+```text
+Name: DG40 AR
+RX Frequency: 431.150000
+TX Frequency: 431.150000
+Mode: DN
+RX DG-ID: 00
+TX DG-ID: 40
+Router route: DG-ID 40 -> BrandMeister TG 3105
+```
 
 ## Matching Router Routes
 
-The radio TX DG-ID must exist in `ysf-bm-router.toml`:
+Every radio TX DG-ID must exist in the router route table. You can add and edit
+routes in the admin UI or directly in `ysf-bm-router.toml`.
+
+Example route:
 
 ```toml
 [[routes]]
@@ -84,13 +106,11 @@ sort_order = 10
 enabled = true
 ```
 
-If you create additional radio channels, add matching `[[routes]]` entries in
-the router config or through the admin UI.
-
 ## Common Mistakes
 
-- Radio is in FM instead of DN.
-- Radio channel frequency does not match the hotspot transmit frequency.
+- Radio channel is in FM instead of DN.
+- Radio channel frequency does not match the hotspot RF setup.
 - Simplex hotspot has different WPSD TX/RX frequencies.
+- Duplex hotspot channel does not use the inverse split.
 - Radio TX DG-ID is not mapped in the router route table.
-- Radio RX DG-ID blocks return traffic. Use `RX 00` for the generic setup.
+- Radio RX DG-ID blocks return traffic. Use `RX DG-ID 00` for the generic setup.

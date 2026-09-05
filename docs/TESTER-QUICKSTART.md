@@ -138,16 +138,16 @@ For duplex, program the radio with the inverse split:
 
 ## 9. Radio Setup
 
-Use DN mode. For the current LZ test, the FT5D CSV example at row `569` uses:
+For each Yaesu channel:
 
-- RX DG-ID: `00`
-- TX DG-ID: `10`
+- Use DN mode.
+- Use `RX DG-ID 00`.
+- Set `TX DG-ID` to the mapped router route.
 
-Key once on DG-ID `10` to select the LZ route. Return traffic should come back
-on DG-ID `00`.
+Example: key once on `TX DG-ID 10` to select the route mapped to BrandMeister
+TG `3205642`. Return traffic should come back on `RX DG-ID 00`.
 
-For additional channels, use `RX DG-ID 00` and set `TX DG-ID` to the mapped
-router route. See [CODEPLUG-EXAMPLE.md](CODEPLUG-EXAMPLE.md).
+See [CODEPLUG-EXAMPLE.md](CODEPLUG-EXAMPLE.md) for exact channel settings.
 
 ## 10. Report Back
 

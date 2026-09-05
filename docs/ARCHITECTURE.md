@@ -12,7 +12,8 @@ Yaesu FT5D
 
 ## Boundaries
 
-The application owns `/opt/ysf-bm-router` and, optionally, a small WPSD dashboard symlink such as `/var/www/dashboard/admin/ysfbm`.
+The application owns `/opt/ysf-bm-router`. The admin UI runs as its own service
+on port `8092` and does not install files into the WPSD dashboard tree.
 
 It must not overwrite:
 
@@ -21,7 +22,7 @@ It must not overwrite:
 - `/usr/local/bin/YSF2DMR`
 - `/usr/local/bin/YSFGateway`
 - `/usr/local/bin/DMRGateway`
-- WPSD dashboard source files, except for a safe link or similar integration point
+- WPSD dashboard source files
 
 ## Modules
 
@@ -30,7 +31,7 @@ It must not overwrite:
 - `brandmeister`: transport boundary for BrandMeister YSF Direct login, keepalive, talkgroup selection, and return packets.
 - `dmr`: Homebrew DMR packet parsing for the DMR-master backend.
 - `bridge`: AMBE/voice frame repacking helpers used by the experimental DMR-to-YSF return path.
-- `web`: future localhost control API and WPSD-integrated UI.
+- `admin`: standalone localhost/LAN admin UI and config API.
 - `scripts`: install, uninstall, and WPSD integration repair scripts.
 
 ## Licensing

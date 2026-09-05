@@ -1,147 +1,108 @@
-# ysf-bm-router
+# Fusion Hotspot Users - Channelize DMR Talkgroups!
 
-`ysf-bm-router` is a WPSD companion service that presents itself as a local YSF reflector and maps Yaesu System Fusion DG-ID values to BrandMeister talkgroups.
+`ysf-bm-router` is a companion service for [WPSD](https://wpsd.radio/) that lets
+Yaesu System Fusion radios use DG-IDs as BrandMeister talkgroup selectors.
 
-With this router, you can program an extra memory bank on your Yaesu Fusion
-radio for your hotspot and treat each channel like a BrandMeister talkgroup
-preset. For example, one channel can transmit DG-ID `10` for LZ, another can
-transmit DG-ID `22` for SWMO, and another can transmit DG-ID `40` for Arkansas,
-while the router handles the BrandMeister talkgroup selection behind the scenes.
+You can add a bank of hotspot channels to your Yaesu radio and make each channel
+select a different BrandMeister talkgroup. For example, one channel can transmit
+DG-ID `10` for LZ, another can transmit DG-ID `22` for SWMO, and another can
+transmit DG-ID `40` for Arkansas. The router handles the BrandMeister talkgroup
+selection behind the scenes.
 
-The service is designed to live outside WPSD-managed files under:
+The service installs outside WPSD-managed paths:
 
 ```text
 /opt/ysf-bm-router
 ```
 
-## Current Tested State
+## Quick Install
 
-The current working path is:
-
-```text
-Yaesu radio
-  -> MMDVMHost / WPSD
-  -> YSFGateway
-  -> ysf-bm-router on 127.0.0.1:42002
-  -> BrandMeister YSF Direct
-  -> BrandMeister return audio
-  -> ysf-bm-router
-  -> YSFGateway / MMDVMHost
-  -> Yaesu radio
-```
-
-Confirmed on WPSD with an FT5D:
-
-- YSF/DN outbound from the radio reaches BrandMeister.
-- BrandMeister return audio reaches the FT5D.
-- DG-ID values select configured BrandMeister talkgroups.
-- The app runs from `/opt/ysf-bm-router` so WPSD updates should not overwrite it.
-
-The DMR/Homebrew conversion code remains in the tree as experimental/reference work. The current tester build uses BrandMeister YSF Direct for live audio both ways.
-
-## WPSD Host Entry
-
-Add this through WPSD's persistent YSF Hosts File Editor:
-
-```text
-01234;YSF-BM-TEST;YSF-BM-TEST;127.0.0.1;42002;001;
-```
-
-Do not edit generated host files directly.
-
-## Install
-
-For tester deployment, SSH into the WPSD hotspot, unzip the deploy package on
-the hotspot, then run `sudo bash scripts/install.sh`. See
-[INSTALL-WPSD.md](INSTALL-WPSD.md) for the full SSH deployment flow, including
-microSD backup and restore options.
-
-Install directly from GitHub over SSH:
+SSH into the WPSD hotspot and install from GitHub:
 
 ```bash
 ssh pi-star@wpsd.local
 
 cd /home/pi-star
-git clone git@github.com:Hoser01/wpsd-ysf-bm-router.git
+git clone https://github.com/Hoser01/wpsd-ysf-bm-router.git
 cd wpsd-ysf-bm-router
-
 sudo bash scripts/install.sh
 ```
 
-Then open the admin UI:
+If you already have SSH keys configured on the hotspot, this clone URL also
+works:
 
-```text
-http://wpsd.local:8092/
+```bash
+git clone git@github.com:Hoser01/wpsd-ysf-bm-router.git
 ```
 
-If `wpsd.local` does not resolve, use the hotspot IP address instead.
+See [INSTALL-WPSD.md](INSTALL-WPSD.md) for the full WPSD setup order, including
+required WPSD settings, the YSF host entry, backup options, and service startup.
+
+## Required WPSD Setup
+
+Before starting the router, WPSD should be configured like this:
+
+- Enable System Fusion / YSF.
+- Add the local YSF host entry for `YSF-BM-TEST`.
+- Link YSF to `YSF-BM-TEST`.
+- Keep WPSD's stock YSF2DMR service stopped/disabled for this path.
+- Keep YSF X-Mode off unless you are intentionally testing WPSD's own cross-mode
+  flow instead of this router.
+- Confirm the radio channel frequencies match the hotspot RF setup.
+
+The YSF host entry is:
+
+```text
+01234;YSF-BM-TEST;YSF-BM-TEST;127.0.0.1;42002;001;
+```
+
+Add it through WPSD's persistent YSF Hosts File Editor. Do not edit generated
+host files directly.
 
 ## Admin UI
 
-The package includes a separate dark admin interface at:
+After install, open:
 
 ```text
 http://wpsd.local:8092/
 ```
 
-It runs as `ysf-bm-router-admin.service`, edits this project's TOML config under
-`/opt/ysf-bm-router`, validates changes before writing, creates a `.bak` backup,
-and shows save/restart status onscreen. The admin UI reads WPSD's selected
-dashboard colors from `/etc/wpsd-css.ini` when available, while still keeping
-all router files outside WPSD-managed dashboard paths. See
-[docs/ADMIN-UI.md](docs/ADMIN-UI.md).
+Use the admin UI to verify BrandMeister credentials, backend settings, behavior
+flags, and DG-ID-to-talkgroup routes. Then click `Apply & Restart`.
 
-## Frequency Requirement
+Detailed admin instructions are in [docs/ADMIN-UI.md](docs/ADMIN-UI.md).
 
-For simplex hotspot operation, WPSD/MMDVMHost TX and RX must both match the radio channel:
+## Yaesu Channels
 
-```ini
-RXFrequency=431150000
-TXFrequency=431150000
-```
-
-For duplex hotspot operation:
-
-- Radio TX must equal hotspot RX.
-- Radio RX must equal hotspot TX.
-
-If the hotspot transmits on a different frequency than the radio is listening to, the radio may light green or flicker but will not decode valid C4FM audio.
-
-## Yaesu Codeplug Example
-
-Program the Yaesu channel in DN mode and use DG-IDs as BrandMeister talkgroup
-selectors. In the FT5D ADMS CSV used for testing, rows `535` and later are the
-example router channels.
-
-For simplex hotspot testing, the radio channel looked like this:
+For each BrandMeister talkgroup channel on the radio:
 
 ```text
-RX Frequency: 431.150000
-TX Frequency: 431.150000
 Mode: DN
-Repeater shift: OFF
-RX/TX mode: RX Normal TX Normal
-DG-ID SQL: 023
+RX DG-ID: 00
+TX DG-ID: the router route number
+Decode/SQL: OFF
+Frequency: match the hotspot RF setup
 ```
 
-Recommended one-channel-per-talkgroup examples:
+Example:
 
 ```text
-DG10 LZ:       RX DG-ID 00, TX DG-ID 10, TG 3205642
-DG11 KCWide:   RX DG-ID 00, TX DG-ID 11, TG 313136
-DG22 SWMO:     RX DG-ID 00, TX DG-ID 22, TG 31291
-DG40 Arkansas: RX DG-ID 00, TX DG-ID 40, TG 3105
+Name: DG10 LZ
+RX DG-ID: 00
+TX DG-ID: 10
+Router route: DG-ID 10 -> BrandMeister TG 3205642
 ```
 
-The radio transmits the mapped DG-ID to select the route. Return traffic normally
-comes back on DG-ID `00`, so `RX 00` is the recommended generic receive setting.
-The working LZ test used this style:
+See [docs/CODEPLUG-EXAMPLE.md](docs/CODEPLUG-EXAMPLE.md) for a complete generic
+codeplug pattern.
 
-```text
-Row 569: LZ2, RX DG-ID 00, TX DG-ID 10
-```
+## More Docs
 
-See [docs/CODEPLUG-EXAMPLE.md](docs/CODEPLUG-EXAMPLE.md) for more detail.
+- [docs/CURRENT-TESTED-STATE.md](docs/CURRENT-TESTED-STATE.md)
+- [docs/ADMIN-UI.md](docs/ADMIN-UI.md)
+- [docs/CODEPLUG-EXAMPLE.md](docs/CODEPLUG-EXAMPLE.md)
+- [docs/CONFIGURATION.md](docs/CONFIGURATION.md)
+- [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
 ## Development
 
@@ -153,8 +114,14 @@ python -m venv .venv
 
 ## Acknowledgments
 
+Thanks to Chip Cuccio, `W0CHP`, for WPSD and the hotspot platform this project
+is designed to complement:
+
+https://wpsd.radio/
+
 This project was inspired by YSFBMDirect by Stefano IS0EIR:
 
 https://github.com/stefanolande/YSFBMDirect
 
-Selected YSF decoder pieces are vendored with attribution. See [THIRD_PARTY.md](THIRD_PARTY.md).
+Selected YSF decoder pieces are vendored with attribution. See
+[THIRD_PARTY.md](THIRD_PARTY.md).
