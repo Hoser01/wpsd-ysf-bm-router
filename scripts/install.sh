@@ -45,7 +45,8 @@ install -m 0644 "${SOURCE_ROOT}/deploy/systemd/${ADMIN_SERVICE_NAME}" "/etc/syst
 systemctl daemon-reload
 
 chown -R pi-star:pi-star "${APP_DIR}/src" "${APP_DIR}/docs" "${APP_DIR}/scripts" 2>/dev/null || true
-systemctl enable --now "${ADMIN_SERVICE_NAME}"
+systemctl enable "${ADMIN_SERVICE_NAME}"
+systemctl restart "${ADMIN_SERVICE_NAME}"
 
 echo "Installed ${SERVICE_NAME}."
 echo "Installed ${ADMIN_SERVICE_NAME}."

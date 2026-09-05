@@ -26,7 +26,7 @@ inside WPSD's dashboard source tree.
 If `/etc/wpsd-css.ini` is missing or unreadable, the admin UI falls back to its
 built-in dark LZ-style palette.
 
-The installer enables and starts the admin service automatically. It runs
+The installer enables and restarts the admin service automatically. It runs
 separately from the router service:
 
 ```bash

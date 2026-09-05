@@ -100,10 +100,11 @@ The installer will:
 6. Print the YSF Hosts File Editor entry.
 7. Print the admin UI URL.
 
-The installer enables and starts the admin UI automatically. It does not start
-the main router service automatically, because BrandMeister credentials and
-routes should be reviewed first. Stop WPSD's stock YSF2DMR service before
-starting this router so both programs do not try to own the BrandMeister path.
+The installer enables and restarts the admin UI automatically, including after
+updates. It does not start the main router service automatically, because
+BrandMeister credentials and routes should be reviewed first. Stop WPSD's stock
+YSF2DMR service before starting this router so both programs do not try to own
+the BrandMeister path.
 
 ```bash
 sudo systemctl stop ysf2dmr.service ysf2dmr.timer

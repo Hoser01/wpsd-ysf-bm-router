@@ -51,7 +51,7 @@ The installer copies files to:
 
 ## 4. Configure
 
-The installer starts the admin UI automatically.
+The installer starts the admin UI automatically, and restarts it after updates.
 
 Open:
 
