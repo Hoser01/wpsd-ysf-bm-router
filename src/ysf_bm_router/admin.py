@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import configparser
 import json
 import logging
+import re
 import subprocess
 from dataclasses import asdict
 from http import HTTPStatus
@@ -15,6 +17,29 @@ from .config import atomic_write_config, config_from_mapping, config_to_toml, lo
 
 LOGGER = logging.getLogger(__name__)
 ROUTER_SERVICE = "ysf-bm-router.service"
+DEFAULT_WPSD_CSS_PATH = "/etc/wpsd-css.ini"
+HEX_COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
+
+FALLBACK_THEME = {
+    "source": "fallback",
+    "path": "",
+    "variables": {
+        "--bg": "#050708",
+        "--panel": "#0b1012",
+        "--panel-2": "#11191c",
+        "--line": "#253338",
+        "--text": "#edf6f4",
+        "--muted": "#98aaa8",
+        "--accent": "#00c16a",
+        "--accent-2": "#f5a524",
+        "--danger": "#ff5c66",
+        "--field": "#06090a",
+        "--banner": "#020405",
+        "--link": "#b58cff",
+        "--row-even": "#080e12",
+        "--row-odd": "#04080a",
+    },
+}
 
 
 def build_config_from_payload(payload: dict[str, Any]):
@@ -40,9 +65,11 @@ def run_admin_server(
     config_path: str | Path,
     host: str = "0.0.0.0",
     port: int = 8092,
+    wpsd_css_path: str | Path = DEFAULT_WPSD_CSS_PATH,
 ) -> None:
     resolved_config = Path(config_path)
-    handler = _make_handler(resolved_config)
+    resolved_wpsd_css = Path(wpsd_css_path)
+    handler = _make_handler(resolved_config, resolved_wpsd_css)
     server = ThreadingHTTPServer((host, port), handler)
     LOGGER.info("admin listening on http://%s:%s", host, port)
     try:
@@ -51,7 +78,7 @@ def run_admin_server(
         server.server_close()
 
 
-def _make_handler(config_path: Path):
+def _make_handler(config_path: Path, wpsd_css_path: Path):
     class AdminHandler(BaseHTTPRequestHandler):
         server_version = "YSFBMRouterAdmin/0.1"
 
@@ -63,7 +90,10 @@ def _make_handler(config_path: Path):
                 self._send_json(_read_config_response(config_path))
                 return
             if self.path == "/api/status":
-                self._send_json(_status_response(config_path))
+                self._send_json(_status_response(config_path, wpsd_css_path))
+                return
+            if self.path == "/api/theme":
+                self._send_json({"ok": True, "theme": read_wpsd_theme(wpsd_css_path)})
                 return
             self.send_error(HTTPStatus.NOT_FOUND)
 
@@ -73,7 +103,13 @@ def _make_handler(config_path: Path):
                 return
             if self.path == "/api/restart":
                 restart = _restart_router()
-                self._send_json({"ok": restart["ok"], "status": _status_response(config_path), "restart": restart})
+                self._send_json(
+                    {
+                        "ok": restart["ok"],
+                        "status": _status_response(config_path, wpsd_css_path),
+                        "restart": restart,
+                    }
+                )
                 return
             self.send_error(HTTPStatus.NOT_FOUND)
 
@@ -92,14 +128,18 @@ def _make_handler(config_path: Path):
                     {
                         "ok": restart is None or restart["ok"],
                         "message": "Configuration saved.",
-                        "status": _status_response(config_path),
+                        "status": _status_response(config_path, wpsd_css_path),
                         "restart": restart,
                     }
                 )
             except Exception as exc:
                 LOGGER.exception("admin config save failed")
                 self._send_json(
-                    {"ok": False, "message": str(exc), "status": _status_response(config_path)},
+                    {
+                        "ok": False,
+                        "message": str(exc),
+                        "status": _status_response(config_path, wpsd_css_path),
+                    },
                     HTTPStatus.BAD_REQUEST,
                 )
 
@@ -137,9 +177,9 @@ def _read_config_response(config_path: Path) -> dict[str, Any]:
     return {"ok": True, "config": asdict(config), "status": _status_response(config_path)}
 
 
-def _status_response(config_path: Path) -> dict[str, Any]:
+def _status_response(config_path: Path, wpsd_css_path: Path | None = None) -> dict[str, Any]:
     exists = config_path.exists()
-    return {
+    status = {
         "config_path": str(config_path),
         "config_exists": exists,
         "config_mtime": config_path.stat().st_mtime if exists else None,
@@ -147,6 +187,61 @@ def _status_response(config_path: Path) -> dict[str, Any]:
         "router_service": _systemctl("is-active", ROUTER_SERVICE),
         "admin_service": _systemctl("is-active", "ysf-bm-router-admin.service"),
     }
+    if wpsd_css_path is not None:
+        status["theme"] = read_wpsd_theme(wpsd_css_path)
+    return status
+
+
+def read_wpsd_theme(path: str | Path = DEFAULT_WPSD_CSS_PATH) -> dict[str, Any]:
+    theme_path = Path(path)
+    if not theme_path.exists():
+        return _fallback_theme()
+
+    parser = configparser.ConfigParser()
+    parser.optionxform = str
+    try:
+        parser.read(theme_path, encoding="utf-8")
+        variables = dict(FALLBACK_THEME["variables"])
+        background = parser["Background"] if parser.has_section("Background") else {}
+        text = parser["Text"] if parser.has_section("Text") else {}
+        extras = parser["ExtraSettings"] if parser.has_section("ExtraSettings") else {}
+        _set_color(variables, "--bg", background.get("PageColor"))
+        _set_color(variables, "--panel", background.get("ContentColor"))
+        _set_color(variables, "--panel-2", background.get("NavPanelColor"))
+        _set_color(variables, "--line", extras.get("TableBorderColor"))
+        _set_color(variables, "--text", text.get("TextColor"))
+        _set_color(variables, "--muted", text.get("TextSectionColor"))
+        _set_color(variables, "--accent", background.get("ModeCellActiveColor"))
+        _set_color(variables, "--accent-2", text.get("BannersColor"))
+        _set_color(variables, "--danger", background.get("ModeCellInactiveColor"))
+        _set_color(variables, "--field", background.get("DropdownColor"))
+        _set_color(variables, "--banner", background.get("BannersColor"))
+        _set_color(variables, "--link", text.get("TextLinkColor"))
+        _set_color(variables, "--row-even", background.get("TableRowBgEvenColor"))
+        _set_color(variables, "--row-odd", background.get("TableRowBgOddColor"))
+        return {
+            "source": "wpsd",
+            "path": str(theme_path),
+            "variables": variables,
+        }
+    except Exception as exc:
+        LOGGER.warning("failed to read WPSD theme from %s: %s", theme_path, exc)
+        theme = _fallback_theme()
+        theme["error"] = str(exc)
+        return theme
+
+
+def _fallback_theme() -> dict[str, Any]:
+    return {
+        "source": FALLBACK_THEME["source"],
+        "path": FALLBACK_THEME["path"],
+        "variables": dict(FALLBACK_THEME["variables"]),
+    }
+
+
+def _set_color(variables: dict[str, str], css_variable: str, value: str | None) -> None:
+    if value and HEX_COLOR_RE.match(value):
+        variables[css_variable] = value.lower()
 
 
 def _restart_router() -> dict[str, Any]:
@@ -188,6 +283,11 @@ def main() -> int:
         default="/opt/ysf-bm-router/config/ysf-bm-router.toml",
         help="Path to ysf-bm-router TOML configuration.",
     )
+    parser.add_argument(
+        "--wpsd-css",
+        default=DEFAULT_WPSD_CSS_PATH,
+        help="Path to WPSD dashboard CSS/theme INI.",
+    )
     parser.add_argument("--host", default="0.0.0.0", help="Admin UI bind address.")
     parser.add_argument("--port", default=8092, type=int, help="Admin UI TCP port.")
     parser.add_argument(
@@ -200,7 +300,7 @@ def main() -> int:
         level=getattr(logging, args.log_level),
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
-    run_admin_server(args.config, args.host, args.port)
+    run_admin_server(args.config, args.host, args.port, args.wpsd_css)
     return 0
 
 
@@ -223,12 +323,16 @@ INDEX_HTML = r"""<!doctype html>
       --accent-2: #f5a524;
       --danger: #ff5c66;
       --field: #06090a;
+      --banner: #020405;
+      --link: #b58cff;
+      --row-even: #080e12;
+      --row-odd: #04080a;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: radial-gradient(circle at top left, rgba(0, 193, 106, 0.14), transparent 34rem), var(--bg);
+      background: var(--bg);
       color: var(--text);
     }
     header {
@@ -241,7 +345,7 @@ INDEX_HTML = r"""<!doctype html>
       gap: 1rem;
       padding: 1rem clamp(1rem, 4vw, 2rem);
       border-bottom: 1px solid var(--line);
-      background: rgba(5, 7, 8, 0.94);
+      background: var(--banner);
       backdrop-filter: blur(12px);
     }
     h1 { margin: 0; font-size: 1.05rem; letter-spacing: 0; }
@@ -253,7 +357,7 @@ INDEX_HTML = r"""<!doctype html>
     }
     section, aside {
       border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(17, 25, 28, 0.96), rgba(9, 13, 15, 0.96));
+      background: var(--panel);
       border-radius: 8px;
       overflow: hidden;
     }
@@ -317,7 +421,9 @@ INDEX_HTML = r"""<!doctype html>
     .routes { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; min-width: 58rem; }
     th, td { border-bottom: 1px solid var(--line); padding: 0.45rem; text-align: left; }
-    th { color: var(--accent-2); font-size: 0.72rem; }
+    th { color: var(--accent-2); background: var(--banner); font-size: 0.72rem; }
+    tbody tr:nth-child(even) { background: var(--row-even); }
+    tbody tr:nth-child(odd) { background: var(--row-odd); }
     td input { padding: 0.45rem; }
     .status {
       padding: 1rem;
@@ -347,8 +453,8 @@ INDEX_HTML = r"""<!doctype html>
       padding: 1rem;
       min-height: 8rem;
       border-top: 1px solid var(--line);
-      background: #030505;
-      color: #bfe9d3;
+      background: var(--field);
+      color: var(--text);
       font-size: 0.8rem;
     }
     .muted { color: var(--muted); }
@@ -410,6 +516,7 @@ INDEX_HTML = r"""<!doctype html>
         <span class="pill"><span id="routerDot" class="dot"></span> Router: <strong id="routerState">unknown</strong></span>
         <span>Config: <strong id="configPath"></strong></span>
         <span>Backup: <strong id="backupPath"></strong></span>
+        <span>Theme: <strong id="themeState">fallback</strong></span>
         <div class="actions">
           <button onclick="saveConfig(false)">Save Only</button>
           <button class="primary" onclick="saveConfig(true)">Apply & Restart</button>
@@ -469,6 +576,28 @@ INDEX_HTML = r"""<!doctype html>
 
     function inputId(section, key) { return `${section}_${key}`; }
     function log(message) { document.getElementById("log").textContent = message; }
+
+    async function loadTheme() {
+      try {
+        const response = await fetch("/api/theme");
+        const data = await response.json();
+        if (!data.ok || !data.theme) return;
+        applyTheme(data.theme);
+      } catch (error) {
+        console.warn("Theme load failed", error);
+      }
+    }
+
+    function applyTheme(theme) {
+      const variables = theme.variables || {};
+      Object.entries(variables).forEach(([key, value]) => {
+        if (key.startsWith("--") && /^#[0-9a-fA-F]{6}$/.test(value)) {
+          document.documentElement.style.setProperty(key, value);
+        }
+      });
+      const label = theme.source === "wpsd" ? `WPSD (${theme.path})` : "fallback";
+      document.getElementById("themeState").textContent = label;
+    }
 
     function renderSection(section) {
       const node = document.getElementById(section);
@@ -547,6 +676,7 @@ INDEX_HTML = r"""<!doctype html>
       document.getElementById("routerDot").classList.toggle("active", router === "active");
       document.getElementById("configPath").textContent = status.config_path || "";
       document.getElementById("backupPath").textContent = status.backup_path || "";
+      if (status.theme) applyTheme(status.theme);
     }
 
     async function loadConfig() {
@@ -648,7 +778,7 @@ INDEX_HTML = r"""<!doctype html>
       return lines.filter(Boolean).join("\n");
     }
 
-    loadConfig().catch((error) => log(`Load failed: ${error}`));
+    loadTheme().finally(() => loadConfig().catch((error) => log(`Load failed: ${error}`)));
   </script>
 </body>
 </html>

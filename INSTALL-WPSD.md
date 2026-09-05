@@ -127,7 +127,9 @@ http://HOTSPOT_IP_ADDRESS:8092/
 The admin interface is separate from WPSD and lives with this project under
 `/opt/ysf-bm-router`. It edits `/opt/ysf-bm-router/config/ysf-bm-router.toml`,
 creates a `.bak` backup when saving, validates the full config, and shows
-onscreen apply/restart status.
+onscreen apply/restart status. It also reads WPSD's selected dashboard colors
+from `/etc/wpsd-css.ini` so the separate admin UI follows the active WPSD
+appearance when that file is available.
 
 You can configure all router sections from the admin UI:
 

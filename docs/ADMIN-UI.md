@@ -11,6 +11,21 @@ http://wpsd.local:8092/
 
 Use the hotspot IP address if `wpsd.local` does not resolve.
 
+## WPSD Theme Matching
+
+The admin UI reads WPSD's selected dashboard color config from:
+
+```text
+/etc/wpsd-css.ini
+```
+
+Those colors are mapped into the admin page as CSS variables, so the router UI
+tracks the currently selected WPSD dashboard appearance without installing files
+inside WPSD's dashboard source tree.
+
+If `/etc/wpsd-css.ini` is missing or unreadable, the admin UI falls back to its
+built-in dark LZ-style palette.
+
 The installer enables and starts the admin service automatically. It runs
 separately from the router service:
 

@@ -69,3 +69,7 @@ and `[[routes]]`. It writes the same TOML file used by the router:
 
 Use `Apply & Restart` in the admin UI for changes that should take effect
 immediately.
+
+The admin service also reads WPSD dashboard colors from `/etc/wpsd-css.ini` and
+exposes them through `/api/theme`. This only reads WPSD's appearance config; it
+does not modify WPSD files.

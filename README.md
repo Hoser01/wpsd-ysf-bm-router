@@ -86,7 +86,10 @@ http://wpsd.local:8092/
 
 It runs as `ysf-bm-router-admin.service`, edits this project's TOML config under
 `/opt/ysf-bm-router`, validates changes before writing, creates a `.bak` backup,
-and shows save/restart status onscreen. See [docs/ADMIN-UI.md](docs/ADMIN-UI.md).
+and shows save/restart status onscreen. The admin UI reads WPSD's selected
+dashboard colors from `/etc/wpsd-css.ini` when available, while still keeping
+all router files outside WPSD-managed dashboard paths. See
+[docs/ADMIN-UI.md](docs/ADMIN-UI.md).
 
 ## Frequency Requirement
 
